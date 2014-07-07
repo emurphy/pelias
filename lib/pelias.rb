@@ -17,7 +17,7 @@ module Pelias
   autoload :LocationIndexer, 'pelias/location_indexer'
 
   # Load configurations
-  #Dir.glob('config/initializers/**/*.rb').each { |f| load(f) }
+  Dir.glob('config/initializers/**/*.rb').each { |f| load(f) }
 
   # Use YAJL
   MultiJson.use :yajl
