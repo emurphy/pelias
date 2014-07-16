@@ -86,7 +86,11 @@ module Pelias
       end
 
       # And save
-      set.finalize!
+      begin
+        set.finalize!
+      rescue Exception => e
+        puts "Ignoring error #{e.message} for #{type}-#{gid}, trace #{e.backtrace}"
+      end
 
     end
 
