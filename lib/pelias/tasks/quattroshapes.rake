@@ -5,8 +5,10 @@ namespace :quattroshapes do
   task :prepare_all  => Pelias::QuattroIndexer::PATHS.map { |t, _| "prepare_#{t}" }
 
   Pelias::QuattroIndexer::PATHS.each do |type, file|
-    task(:"prepare_#{type}") { perform_prepare(type, file) }
-    task(:"populate_#{type}") { perform_index(type) }
+    t = task(:"prepare_#{type}") { perform_prepare(type, file) }
+    t.add_description("download quattroshapes #{type} file and load to postgresql")
+    t = task(:"populate_#{type}") { perform_index(type) }
+    t.add_description("search index quattroshapes #{type}")
   end
 
   private

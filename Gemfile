@@ -16,7 +16,7 @@ gem 'yajl-ruby'
 gem 'numbers_and_words'
 
 group :test, :development do
-  gem 'debugger'
+  #gem 'debugger'
   gem 'guard-rspec', require: false
 end
 

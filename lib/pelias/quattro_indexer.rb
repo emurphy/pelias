@@ -9,7 +9,8 @@ module Pelias
       admin2: 'qs_adm2',
       local_admin: 'qs_localadmin',
       locality: 'gn-qs_localities',
-      neighborhood: 'qs_neighborhoods'
+      neighborhood: 'qs_neighborhoods',
+      gazeteer: 'quattroshapes_gazetteer_gn_then_gp'
     }
 
     ABBR_FIELDS = {

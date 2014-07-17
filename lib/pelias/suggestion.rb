@@ -38,6 +38,7 @@ module Pelias
 
     def rebuild_suggestions_for_locality(e)
       inputs = [e.name, e.admin1_abbr, e.admin1_name, e.local_admin_name, e.admin2_name]
+      inputs = inputs + e.alternate_names if e.alternate_names
       {
         input: inputs,
         output: [e.name, e.admin1_abbr || e.admin1_name].compact.join(', '),
