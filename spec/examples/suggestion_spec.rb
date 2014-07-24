@@ -140,7 +140,7 @@ describe Pelias::Suggestion do
 
     context 'with a basic locality' do
 
-      let(:data) { { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', local_admin_name: 'local admin', admin2_name: 'admin2', population: 100_000 } }
+      let(:data) { { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', local_admin_name: 'local admin', admin2_name: 'admin2', admin0_abbr: "US", population: 100_000 } }
 
       it 'should use the name as an input' do
         suggestion[:input].should include 'name'
