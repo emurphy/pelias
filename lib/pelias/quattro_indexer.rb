@@ -17,7 +17,7 @@ module Pelias
     }
 
     NAME_FIELDS = {
-      admin0: :qs_a0,
+      admin0: :qs_adm0,
       admin1: :qs_a1,
       admin2: :qs_a2,
       local_admin: :qs_la,

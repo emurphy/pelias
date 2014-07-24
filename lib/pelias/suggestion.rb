@@ -39,11 +39,22 @@ module Pelias
 
     def rebuild_suggestions_for_locality(e)
       boost = e.population.to_i / 100_000
-      inputs = [e.name, e.admin1_abbr, e.admin1_name, e.local_admin_name, e.admin2_name]
+      inputs = [e.name, e.local_admin_name] # , e.admin2_name]
+      outputs = [e.name]
+      if e.admin0_abbr == "US"
+        state_abbr = e.admin1_abbr
+        state = e.admin1_name
+        inputs << state_abbr
+        outputs << state_abbr || state
+      else
+        country = e.admin0_name
+        inputs << country
+        outputs << country
+      end
       inputs = inputs + e.alternate_names if e.alternate_names
       {
         input: inputs,
-        output: [e.name, e.admin1_abbr || e.admin1_name].compact.join(', '),
+        output: outputs.compact.join(', '),
         weight: boost < 1 ? 1 : boost
       }
     end
