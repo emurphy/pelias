@@ -72,7 +72,7 @@ module Pelias
             entry['name'] = gn_data[:name]
             entry['population'] = gn_data[:population]
 
-            gn_alt_names = DB[:gn_alternatename].select(:alternatename).where(geonameid: gn_id, isolanguage: 'en')
+            gn_alt_names = DB[:gn_alternatename].select(:alternatename).where(geonameid: gn_id, isolanguage: ['en', 'iata'])
             entry['alternate_names'] = gn_alt_names.map { |r| r[:alternatename] }
           end
         end
