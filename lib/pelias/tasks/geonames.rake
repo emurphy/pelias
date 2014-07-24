@@ -19,6 +19,13 @@ namespace :geonames do
 
   end
 
+  # desc "Add geometry column for use by task quattroshapes:patch_geoname_ids"
+  task :add_geometry do
+    Pelias::DB.run("SELECT AddGeometryColumn ('public','gn_geoname','geom',4326,'POINT',2)")
+    Pelias::DB.run("UPDATE gn_geoname SET geom = ST_PointFromText('POINT(' || longitude || ' ' || latitude || ')', 4326)")
+    Pelias::DB.run("CREATE INDEX idx_gn_geoname_geom ON public.gn_geoname USING gist(geom)")
+  end
+
   task :download do
     ['allCountries', 'alternateNames'].each do |name|
       unless File.exist?("#{TEMP_PATH}/#{name}.txt")
