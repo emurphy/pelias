@@ -4,6 +4,7 @@ namespace :synonyms do
 
   task :build do
 
+    desc "build list of synonyms from config/ .txt files"
     def suffix_for(i)
       n = i % 10
       case n

@@ -135,4 +135,46 @@ describe Pelias::Suggestion do
 
   end
 
+  describe :rebuild_suggestions_for_locality do
+    let(:suggestion) { Pelias::Suggestion.rebuild_suggestions_for_locality(Hashie::Mash.new(data)) }
+
+    context 'with a basic locality' do
+
+      let(:data) { { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', local_admin_name: 'local admin', admin2_name: 'admin2', population: 100_000 } }
+
+      it 'should use the name as an input' do
+        suggestion[:input].should include 'name'
+      end
+
+      it 'should use the admin1_abbr as an input' do
+        suggestion[:input].should include 'a1'
+      end
+
+      it 'should use the local admin name' do
+        suggestion[:input].should include 'local admin'
+      end
+
+      it 'should construct a friendly output' do
+        suggestion[:output].should == 'name, a1'
+      end
+
+      it 'should have a weight based on population' do
+        suggestion[:weight].should == 13
+      end
+
+      context 'also with alternate names' do
+
+        let(:data_plus_alt) { data.merge({ 'alternate_names' => ['alt1', 'alt2']}) }
+        let(:suggestion) { Pelias::Suggestion.rebuild_suggestions_for_locality(Hashie::Mash.new(data_plus_alt)) }
+
+        it 'should include alternates in input' do
+          suggestion[:input].should include 'alt1'
+        end
+
+      end
+
+    end
+
+  end
+
 end
