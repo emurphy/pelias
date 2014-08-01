@@ -65,15 +65,30 @@ module Pelias
         entry['woe_id'] = woe_id
         entry['center_point'] = parse_point record[:st_centroid]
 
-        # Use GN data if we have it
+        # Use GN data if we have it, either from Redis or directly from postgresql
         if gn_id
-          gn_data = DB[:gn_geoname].select(:name, :population).where(geonameid: gn_id).first
-          if gn_data
-            entry['name'] = gn_data[:name]
-            entry['population'] = gn_data[:population]
-
-            gn_alt_names = DB[:gn_alternatename].select(:alternatename).where(geonameid: gn_id, isolanguage: ['en', 'iata'])
-            entry['alternate_names'] = gn_alt_names.map { |r| r[:alternatename] }
+          if gn_raw = Pelias::REDIS.hget('geoname', gn_id)
+            gn_data = JSON.parse(gn_raw)
+            entry['name'] = gn_data['name']
+            entry['population'] = gn_data['population'].to_i
+            entry['hotels'] = gn_data['hotels']
+            entry['hotel_market_weight'] = gn_data['market_weight']
+            entry['alternate_names'] = gn_data['alternate_names']
+          else
+            gn_data = DB[:gn_geoname].select(:name, :population).where(geonameid: gn_id).first
+            if gn_data
+              entry['name'] = gn_data[:name]
+              entry['population'] = gn_data[:population]
+              if Hotels::CLIENT.present?
+                count_and_weight = Hotels::CLIENT.count_within gn_id
+                entry['hotels'] = count_and_weight[:count]
+                entry['hotel_market_weight'] = count_and_weight[:market_weight]
+              else
+                entry['hotels'] = nil
+                entry['hotel_market_weight'] = nil
+              end
+              entry['alternate_names'] = Pelias::Geonames.alternate_names(gn_id)
+            end
           end
         end
 
