@@ -19,7 +19,7 @@ module Pelias
     end
 
     def rebuild_suggestions_for_admin2(e)
-      boost = e.population.to_i / 100_000
+      boost = weight(e)
       {
         input:  [e.name, e.admin1_abbr, e.admin1_name],
         output: [e.name, e.admin1_abbr || e.admin1_name].compact.join(', '),
@@ -28,7 +28,7 @@ module Pelias
     end
 
     def rebuild_suggestions_for_local_admin(e)
-      boost = e.population.to_i / 100_000
+      boost = weight(e)
       inputs = [e.name, e.admin1_abbr, e.admin1_name, e.locality_name, e.admin2_name]
       {
         input: inputs,
@@ -38,7 +38,7 @@ module Pelias
     end
 
     def rebuild_suggestions_for_locality(e)
-      boost = e.population.to_i / 100_000
+      boost = weight(e)
       inputs = [e.name, e.local_admin_name] # , e.admin2_name]
       outputs = [e.name]
       if e.admin0_abbr == "US"
@@ -98,6 +98,17 @@ module Pelias
       }
     end
 
+    def weight(entry)
+      weight_by_hotels entry
+    end
+
+    def weight_by_hotels(entry)
+      entry.hotel_market_weight.to_i / 10
+    end
+
+    def weight_by_population(entry)
+      entry.population.to_i / 100_000
+    end
   end
 
 end

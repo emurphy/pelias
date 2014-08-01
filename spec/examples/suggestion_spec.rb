@@ -65,7 +65,7 @@ describe Pelias::Suggestion do
 
     context 'with a basic admin2' do
 
-      let(:data) { { name: 'name', population: 100_000_000, admin1_name: 'new york', admin1_abbr: 'ny' } }
+      let(:data) { { name: 'name', population: 100_000_000, admin1_name: 'new york', admin1_abbr: 'ny', hotel_market_weight: 550 } }
 
       it 'should use the admin1_name as an input' do
         suggestion[:input].should include 'new york'
@@ -80,7 +80,7 @@ describe Pelias::Suggestion do
       end
 
       it 'should use the name as an input' do
-        suggestion[:weight].should == 1_000
+        suggestion[:weight].should == 55
       end
 
     end
@@ -93,7 +93,10 @@ describe Pelias::Suggestion do
 
     context 'with a basic local_admin' do
 
-      let(:data) { { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', locality_name: 'locality', admin2_name: 'admin2', population: 1_300_000 } }
+      let(:data) do
+        { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', locality_name: 'locality',
+                      admin2_name: 'admin2', population: 1_300_000, hotel_market_weight: 350 }
+      end
 
       it 'should use the name as an input' do
         suggestion[:input].should include 'name'
@@ -112,7 +115,7 @@ describe Pelias::Suggestion do
       end
 
       it 'should have a weight based on population' do
-        suggestion[:weight].should == 13
+        suggestion[:weight].should == 35
       end
 
     end
@@ -140,7 +143,11 @@ describe Pelias::Suggestion do
 
     context 'with a basic locality' do
 
-      let(:data) { { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', local_admin_name: 'local admin', admin2_name: 'admin2', admin0_abbr: "US", population: 1_300_000 } }
+      let(:data) do
+        { name: 'name', admin1_abbr: 'a1', admin1_name: 'admin1', local_admin_name: 'local admin',
+          admin2_name: 'admin2', admin0_abbr: "US", population: 1_300_000, hotel_market_weight: 20 }
+
+      end
 
       it 'should use the name as an input' do
         suggestion[:input].should include 'name'
@@ -159,7 +166,7 @@ describe Pelias::Suggestion do
       end
 
       it 'should have a weight based on population' do
-        suggestion[:weight].should == 13
+        suggestion[:weight].should == 2
       end
 
       context 'also with alternate names' do
