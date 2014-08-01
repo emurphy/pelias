@@ -81,8 +81,8 @@ module Pelias
               entry['population'] = gn_data[:population]
               if Hotels::CLIENT.present?
                 count_and_weight = Hotels::CLIENT.count_within gn_id
-                entry['hotels'] = count_and_weight[:count]
-                entry['hotel_market_weight'] = count_and_weight[:market_weight]
+                entry['hotels'] = count_and_weight['count']
+                entry['hotel_market_weight'] = count_and_weight['market_weight']
               else
                 entry['hotels'] = nil
                 entry['hotel_market_weight'] = nil
