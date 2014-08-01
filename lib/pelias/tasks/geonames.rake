@@ -8,28 +8,31 @@ namespace :geonames do
   end
 
   task :cache do
+    INCREMENTAL = false
     i = 0
     File.open("#{TEMP_PATH}/allCountries.txt").each do |line|
       puts "Inserted #{i}" if (i += 1) % 10_000 == 0
       arr = line.chomp.split("\t")
       geoname_id = arr[0]
-      if Hotels::CLIENT.present?
-        count_and_weight = Hotels::CLIENT.count_within geoname_id
-        if count_and_weight.present?
-          hotel_count = count_and_weight[:count]
-          hotel_market_weight = count_and_weight[:market_weight]
-        end
-      end
-      hotel_count = '' if hotel_count.nil?
-      hotel_market_weight = '' if hotel_market_weight.nil?
       begin
-        Pelias::REDIS.hset('geoname', geoname_id, {
-            name: arr[1],
-            population: arr[14].to_i,
-            hotels: hotel_count,
-            hotel_market_weight: hotel_market_weight,
-            alternate_names: Pelias::Geonames.alternate_names(geoname_id)
-        }.to_json)
+        unless INCREMENTAL && Pelias::REDIS.hget('geoname', geoname_id)
+          if Hotels::CLIENT.present?
+            count_and_weight = Hotels::CLIENT.count_within geoname_id
+            if count_and_weight.present?
+                hotel_count = count_and_weight[:count]
+                hotel_market_weight = count_and_weight[:market_weight]
+              end
+            end
+            hotel_count = '' if hotel_count.nil?
+            hotel_market_weight = '' if hotel_market_weight.nil?
+              Pelias::REDIS.hset('geoname', geoname_id, {
+                  name: arr[1],
+                  population: arr[14].to_i,
+                  hotels: hotel_count,
+                  hotel_market_weight: hotel_market_weight,
+                  alternate_names: Pelias::Geonames.alternate_names(geoname_id)
+              }.to_json)
+          end
       rescue Redis::BaseConnectionError
         retry
       end
