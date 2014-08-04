@@ -30,6 +30,19 @@ namespace :quattroshapes do
     Pelias::DB.run(patch_sql)
   end
 
+  task :populate_locality_test, [:ids_file] do |t, args|
+    Pelias::INDEX = Pelias::INDEX + '-test'
+    Rake::Task["index:destroy"].invoke rescue
+    Rake::Task["index:create"].invoke
+    ids = File.open(args[:ids_file], 'r').readlines
+    i = 0
+    ids.each do |id|
+      puts "Prepared #{i}" if (i += 1) % 100 == 0
+      parts = id.split(':')
+      Pelias::QuattroIndexer.perform_async parts[1], parts[2]
+    end
+  end
+
   private
 
   # Download the things we need
