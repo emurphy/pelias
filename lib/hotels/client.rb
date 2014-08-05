@@ -3,13 +3,21 @@ require 'curb'
 module Hotels
   class Client
 
-    attr_accessor :url
+    attr_accessor :url, :username, :password
 
     def count_within(geoname_id)
       path = "/hotels/count.json?gn_id=#{geoname_id}"
       request_url = "#{url}#{path}"
       begin
-        http = Curl.get(request_url)
+        if username.present? && password.present?
+          http = Curl::Easy.new(request_url)
+          http.http_auth_types = :basic
+          http.username = username
+          http.password = password
+          http.perform
+        else
+          http = Curl.get(request_url)
+        end
         if (http.response_code == 200)
           #puts "#{request_url} responded with #{http.body_str}"
           MultiJson.load(http.body_str)
