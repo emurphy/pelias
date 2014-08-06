@@ -103,7 +103,15 @@ module Pelias
     end
 
     def weight_by_hotels(entry)
-      entry.hotel_market_weight.to_i / 10
+      if entry.hotel_market_weight.present?
+        entry.hotel_market_weight.to_i / 10
+      else
+        if entry.gn_id.present?
+          weight_by_population entry
+        else
+          1
+        end
+      end
     end
 
     def weight_by_population(entry)
