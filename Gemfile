@@ -14,6 +14,7 @@ gem 'typhoeus'
 gem 'unicorn'
 gem 'yajl-ruby'
 gem 'numbers_and_words'
+gem 'curb'
 
 group :test, :development do
   #gem 'debugger'

@@ -2,3 +2,4 @@ extracts
 .bundle
 coverage
 config/synonyms.txt
+config/hotels.yml
