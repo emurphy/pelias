@@ -4,7 +4,7 @@ namespace :index do
 
   desc 'setup index & mappings'
   task :create do
-    schema_file = File.read('config/pelias_schema.json').gsub('%DIRPATH%', File.expand_path('.'))
+    schema_file = File.read('config/pelias_schema.json') #.gsub('%DIRPATH%', File.expand_path('.'))
     schema_json = JSON.parse(schema_file)
     Pelias::ES_CLIENT.indices.create(index: Pelias::INDEX, body: schema_json)
   end
