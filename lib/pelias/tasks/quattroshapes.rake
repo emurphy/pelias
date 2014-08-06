@@ -7,8 +7,11 @@ namespace :quattroshapes do
   Pelias::QuattroIndexer::PATHS.each do |type, file|
     t = task(:"prepare_#{type}") { perform_prepare(type, file) }
     t.add_description("download quattroshapes #{type} file and load to postgresql")
-    t = task(:"populate_#{type}") { perform_index(type) }
-    t.add_description("search index quattroshapes #{type}")
+    task(:"populate_#{type}", :order) do |t, args|
+      t.add_description("search index quattroshapes #{type} with optional order (default 'ASC')")
+      args.with_defaults(:order => 'ASC')
+      perform_index(type, args[:order])
+    end
   end
 
   desc "Update qs_locality.qs_gn_id where null and fits within polygon"
@@ -55,9 +58,13 @@ namespace :quattroshapes do
   end
 
   # Perform an index
-  def perform_index(type)
+  def perform_index(type, order)
+    unless ['ASC','DESC'].include? order.upcase
+      puts "Ignoring order parameter #{order}, using ASC"
+      order = 'ASC'
+    end
     i = 0
-    Pelias::DB["select gid from qs_#{type}"].use_cursor.each do |row|
+    Pelias::DB["select gid from qs_#{type} order by gid #{order}"].use_cursor.each do |row|
       puts "Prepared #{i}" if (i += 1) % 10_000 == 0
       Pelias::QuattroIndexer.perform_async type, row[:gid]
     end
