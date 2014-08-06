@@ -81,9 +81,12 @@ module Pelias
               entry['population'] = gn_data[:population]
               if Hotels::CLIENT.present?
                 count_and_weight = Hotels::CLIENT.count_within gn_id
+              end
+              if count_and_weight.present?
                 entry['hotels'] = count_and_weight['count']
                 entry['hotel_market_weight'] = count_and_weight['market_weight']
               else
+                puts "WARN: no hotel count for geoname #{gn_data[:name]}, qs:#{type}:#{gid}"
                 entry['hotels'] = nil
                 entry['hotel_market_weight'] = nil
               end
