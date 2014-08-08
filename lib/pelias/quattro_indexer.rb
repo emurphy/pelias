@@ -27,7 +27,7 @@ module Pelias
 
     SHAPE_ORDER = [:admin0, :admin1, :admin2, :local_admin, :locality, :neighborhood, :street, :address, :poi]
 
-    def perform(type, gid)
+    def perform(type, gid, index=nil)
 
       type_sym = type.to_sym
 
@@ -40,12 +40,16 @@ module Pelias
       fields << :qs_iso_cc if type_sym == :admin1
       record = DB[:"qs_#{type}"].select(*fields).where(gid: gid).first
 
+      if record.nil?
+        puts "WARN: qs:#{type}:#{gid} is missing"
+        return
+      end
       # grab our ids
       gn_id = sti record[:qs_gn_id]
       woe_id = sti record[:qs_woe_id]
 
       # Build a set
-      set = Pelias::LocationSet.new
+      set = Pelias::LocationSet.new index
       set.append_records "#{type}.gn_id", gn_id
       set.append_records "#{type}.woe_id", woe_id
       set.close_records_for type
@@ -79,10 +83,10 @@ module Pelias
             if gn_data
               entry['name'] = gn_data[:name]
               entry['population'] = gn_data[:population]
-              if Hotels::CLIENT.present?
+              if Hotels::CLIENT
                 count_and_weight = Hotels::CLIENT.count_within gn_id
               end
-              if count_and_weight.present?
+              if count_and_weight
                 entry['hotels'] = count_and_weight['count']
                 entry['hotel_market_weight'] = count_and_weight['market_weight']
               else

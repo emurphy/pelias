@@ -16,9 +16,9 @@ namespace :geonames do
       geoname_id = arr[0]
       begin
         unless INCREMENTAL && Pelias::REDIS.hget('geoname', geoname_id)
-          if Hotels::CLIENT.present?
+          if Hotels::CLIENT
             count_and_weight = Hotels::CLIENT.count_within geoname_id
-            if count_and_weight.present?
+            if count_and_weight
                 hotel_count = count_and_weight[:count]
                 hotel_market_weight = count_and_weight[:market_weight]
               end

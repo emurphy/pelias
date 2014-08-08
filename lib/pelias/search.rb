@@ -57,8 +57,8 @@ module Pelias
 
     # Grab suggestions using an ElasticSearch completion suggester:
     # http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-suggesters-completion.html
-    def suggest(query, size)
-      ES_CLIENT.suggest(index: Pelias::INDEX, body: {
+    def suggest(query, size, index=Pelias::INDEX)
+      ES_CLIENT.suggest(index: index, body: {
         suggestions: {
           text: query,
           completion: {
