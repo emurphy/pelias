@@ -37,13 +37,13 @@ module Pelias
     def rebuild_suggestions_for_locality(e)
       boost = weight(e)
       outputs = [e.name]
+      country = e.admin0_name
       if e.admin0_abbr == "US"
         state_abbr = e.admin1_abbr
         state = e.admin1_name
-        inputs = [e.name, state_abbr, state]
+        inputs = [e.name, state_abbr, state, country]
         outputs << state_abbr || state
       else
-        country = e.admin0_name
         inputs = [e.name, e.admin0_abbr, country]
         outputs << country
       end
@@ -100,7 +100,7 @@ module Pelias
 
     def weight_by_hotels(entry)
       if entry.hotel_market_weight
-        entry.hotel_market_weight.to_i / 10
+        entry.hotel_market_weight.to_i
       else
         if entry.gn_id
           weight_by_population entry
