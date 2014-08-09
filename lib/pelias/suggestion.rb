@@ -12,43 +12,39 @@ module Pelias
 
     def rebuild_suggestions_for_admin1(e)
       {
-        input: [e.name],
+        input: [],
         output: e.name,
         weight: 1
       }
     end
 
     def rebuild_suggestions_for_admin2(e)
-      boost = weight(e)
       {
-        input:  [e.name, e.admin1_abbr, e.admin1_name],
+        input:  [],
         output: [e.name, e.admin1_abbr || e.admin1_name].compact.join(', '),
-        weight: boost < 1 ? 1 : boost
+        weight: 1
       }
     end
 
     def rebuild_suggestions_for_local_admin(e)
-      boost = weight(e)
-      inputs = [e.name, e.admin1_abbr, e.admin1_name, e.locality_name, e.admin2_name]
       {
-        input: inputs,
+        input: [],
         output: [e.name, e.admin1_abbr || e.admin1_name].compact.join(', '),
-        weight: boost < 1 ? 1 : boost
+        weight: 1
       }
     end
 
     def rebuild_suggestions_for_locality(e)
       boost = weight(e)
-      inputs = [e.name, e.local_admin_name] # , e.admin2_name]
       outputs = [e.name]
       if e.admin0_abbr == "US"
         state_abbr = e.admin1_abbr
         state = e.admin1_name
-        inputs << state_abbr
+        inputs = [e.name, state_abbr, state]
         outputs << state_abbr || state
       else
         country = e.admin0_name
-        inputs << country
+        inputs = [e.name, e.admin0_abbr, country]
         outputs << country
       end
       inputs = inputs + e.alternate_names if e.alternate_names

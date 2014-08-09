@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'exclude local_admin' do
 
   INDEX = "spec-suggest-#{Time.now.to_i}"
-  CLEANUP=true
+  CLEANUP = false
 
   let(:suggest) { Pelias::Search.suggest(term, 50, INDEX) }
   let(:options) { suggest['suggestions'][0]['options'] }
@@ -19,7 +19,8 @@ describe 'exclude local_admin' do
 
   before(:each) do
     status = Pelias::ES_CLIENT.indices.status index: INDEX
-    if status['indices'][INDEX]['docs']['num_docs'] == 0
+    index_status = status['indices'][INDEX]
+    unless index_status.include? 'docs' && index_status['docs']['num_docs'] > 0
       ids = File.open("#{File.dirname(__FILE__)}/qs_ids/#{term}.txt", 'r').readlines
       ids.each do |id|
         parts = id.split(':')
@@ -68,7 +69,7 @@ describe 'exclude local_admin' do
       end
 
       it 'should have Chicago locality as top result' do
-        expect(options[0]['payload']['_id']).to eql 'qs:locality:6919'
+        expect(options[0]['payload']['_id'].strip).to eql 'qs:locality:6919'
       end
 
     end
