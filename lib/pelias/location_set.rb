@@ -5,9 +5,11 @@ module Pelias
     TYPE = 'location'
 
     attr_reader :records
+    attr_reader :index
 
-    def initialize
+    def initialize(index=Pelias::INDEX)
       @records = []
+      @index = index
     end
 
     def update(&block)
@@ -41,7 +43,7 @@ module Pelias
             bulk << { index: { _id: record.delete('_id'), data: record } }
           end
         end
-        r = ES_CLIENT.bulk(index: Pelias::INDEX, type: 'location', body: bulk)
+        r = ES_CLIENT.bulk(index: index, type: 'location', body: bulk)
         raise r.inspect if r['errors']
       end
     end
@@ -57,7 +59,7 @@ module Pelias
         if result
 
           begin
-            record = Pelias::ES_CLIENT.get(id: "qs:#{type}:#{result[:gid]}", type: 'location', index: Pelias::INDEX)
+            record = Pelias::ES_CLIENT.get(id: "qs:#{type}:#{result[:gid]}", type: 'location', index: index)
             source = record['_source']
 
             entry['refs'] ||= {}
@@ -66,8 +68,8 @@ module Pelias
             entry["#{type}_abbr"] = source['abbr']
             entry["#{type}_alternate_names"] = source['alternate_names']
           rescue
-            Pelias::QuattroIndexer.new.perform type, result[:gid]
-            Pelias::ES_CLIENT.indices.refresh(index: Pelias::INDEX)
+            Pelias::QuattroIndexer.new.perform type, result[:gid], index
+            Pelias::ES_CLIENT.indices.refresh(index: index)
             retry
           end
 
@@ -79,7 +81,7 @@ module Pelias
     def append_records(field, id)
       return unless id
       t = { field => id }
-      results = ES_CLIENT.search(index: Pelias::INDEX, type: TYPE, body: { query: { term: t } })
+      results = ES_CLIENT.search(index: index, type: TYPE, body: { query: { term: t } })
       records.concat results['hits']['hits']
     end
 

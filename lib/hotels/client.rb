@@ -9,7 +9,7 @@ module Hotels
       path = "/hotels/count.json?gn_id=#{geoname_id}"
       request_url = "#{url}#{path}"
       begin
-        if username.present? && password.present?
+        if username && password
           http = Curl::Easy.new(request_url)
           http.http_auth_types = :basic
           http.username = username

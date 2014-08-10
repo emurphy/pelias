@@ -34,7 +34,7 @@ namespace :quattroshapes do
   end
 
   task :populate_locality_test, [:ids_file] do |t, args|
-    Pelias::INDEX = Pelias::INDEX + '-test'
+    index = Pelias::INDEX + '-test'
     Rake::Task["index:destroy"].invoke rescue
     Rake::Task["index:create"].invoke
     ids = File.open(args[:ids_file], 'r').readlines
@@ -42,7 +42,7 @@ namespace :quattroshapes do
     ids.each do |id|
       puts "Prepared #{i}" if (i += 1) % 100 == 0
       parts = id.split(':')
-      Pelias::QuattroIndexer.perform_async parts[1], parts[2]
+      Pelias::QuattroIndexer.perform_async parts[1], parts[2], index
     end
   end
 
@@ -66,7 +66,7 @@ namespace :quattroshapes do
     i = 0
     Pelias::DB["select gid from qs_#{type} order by gid #{order}"].use_cursor.each do |row|
       puts "Prepared #{i}" if (i += 1) % 10_000 == 0
-      Pelias::QuattroIndexer.perform_async type, row[:gid]
+      Pelias::QuattroIndexer.perform_async type, row[:gid], Pelias::INDEX
     end
   end
 
