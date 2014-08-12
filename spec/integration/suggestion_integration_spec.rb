@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'exclude local_admin' do
 
   INDEX = "spec-suggest-#{Time.now.to_i}"
-  CLEANUP = false
+  CLEANUP = true
 
   let(:suggest) { Pelias::Search.suggest(term, 50, INDEX) }
   let(:options) { suggest['suggestions'][0]['options'] }
