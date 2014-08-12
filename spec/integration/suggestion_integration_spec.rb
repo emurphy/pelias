@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'exclude local_admin' do
 
   INDEX = "spec-suggest-#{Time.now.to_i}"
-  CLEANUP = true
+  CLEANUP = false
 
   let(:suggest) { Pelias::Search.suggest(term, 50, INDEX) }
   let(:options) { suggest['suggestions'][0]['options'] }
@@ -20,7 +20,7 @@ describe 'exclude local_admin' do
   before(:each) do
     status = Pelias::ES_CLIENT.indices.status index: INDEX
     index_status = status['indices'][INDEX]
-    unless index_status.include? 'docs' || index_status['docs'].include?('num_docs') || index_status['docs']['num_docs'] > 0
+    unless index_status.include? 'docs' && index_status['docs'].include?('num_docs') && index_status['docs']['num_docs'] > 0
       ids = File.open("#{File.dirname(__FILE__)}/qs_ids/#{term}.txt", 'r').readlines
       i = 0
       ids.each do |id|

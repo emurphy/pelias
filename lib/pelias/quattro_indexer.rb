@@ -27,7 +27,7 @@ module Pelias
 
     SHAPE_ORDER = [:admin0, :admin1, :admin2, :local_admin, :locality, :neighborhood, :street, :address, :poi]
 
-    def perform(type, gid, index=nil)
+    def perform(type, gid, index=Pelias::INDEX)
 
       type_sym = type.to_sym
 
